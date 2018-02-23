@@ -2,6 +2,9 @@ package connecta4;
 
 
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.FileNotFoundException;
@@ -50,7 +53,6 @@ public class UI extends javax.swing.JFrame {
         pinta();
         //Posem icona eXiT a la finestra
         sys_os = System.getProperty("os.name");
-        System.out.println(sys_os);
         String patt = "\\Imatges\\icon.png";
         if (!sys_os.startsWith("Windows")){
             patt = "//Imatges//icon.png";
@@ -244,12 +246,15 @@ public class UI extends javax.swing.JFrame {
         if (!sys_os.startsWith("Windows")){
             patt = "//Imatges//im";
         }
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        int height = (int)(screenSize.getHeight()-200) / 7;
         for (int i = 0; i != escena.getX(); i++) {
             for (int j = 0; j != escena.getY(); j++) {
-                System.out.println(patt);
                 String dir = System.getProperty("user.dir") + patt + Integer.toString(escena.getpos(i, j)) + ".jpg";
-                System.out.println(dir);
                 ImageIcon icon= new ImageIcon(dir);
+                Image resizeIcon = icon.getImage();
+                Image newImage = resizeIcon.getScaledInstance(height, height, Image.SCALE_DEFAULT);
+                icon = new ImageIcon(newImage);
                 jTable2.setValueAt(icon, (int) escena.getY() - j -1, (int) i);//la visualitzacio s'ha de girar
             }
         }
@@ -265,18 +270,20 @@ public class UI extends javax.swing.JFrame {
         x = (int) escena.getY();
         DefaultTableModel Tmodel = new DefaultTableModel(x, y);
         jTable2.setModel(Tmodel);
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        int height = (int)(screenSize.getHeight()-200) / 7;
         for (int i = 0; i != y; i++) {
             jTable2.getColumnModel().getColumn(i).setCellRenderer(new ImageRenderer());
 
             //posem amplada preferida i actual a 50
-            jTable2.getColumnModel().getColumn(i).setPreferredWidth(75);
-            jTable2.getColumnModel().getColumn(i).setWidth(75);
+            jTable2.getColumnModel().getColumn(i).setPreferredWidth(height);
+            jTable2.getColumnModel().getColumn(i).setWidth(height);
         }
 
         //posem el color
        // jTable2.setBackground(Color.white);
 
         //posem les mides a les celles
-        jTable2.setRowHeight(75);
+        jTable2.setRowHeight(height);
     }
 }
