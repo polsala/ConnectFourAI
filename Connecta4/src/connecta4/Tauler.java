@@ -1,6 +1,7 @@
 package connecta4;
 
 import java.awt.Frame;
+import java.util.Scanner;
 import javax.swing.JOptionPane;
 /*
  * Es la classe que mantindra en memoria tot el nostre entorn de simulació.
@@ -11,7 +12,7 @@ import javax.swing.JOptionPane;
 
 /**
  *
- * @author Llorenç
+ * @author 
  */
 public class Tauler {
 
@@ -44,10 +45,28 @@ public class Tauler {
         jugador2 = new Player2(this);
         
     }
+    
+    public Tauler(Tauler t) {
 
-    public int[][] getTaulell(){
-        /*Retorna el taulell*/
-        return this.taulell;
+        this.dimx = t.dimx;   // minim 4
+        this.dimy = t.dimy; // minim 4
+        this.taulell = new int[this.dimx][this.dimy];
+        this.jugador = t.jugador;
+
+        jugador1 = new Player1(this);
+        jugador2 = new Player2(this);
+
+        for(int i = 0; i != this.dimx; i++){
+            for (int j = 0; j != this.dimy; j++) {
+                this.taulell[i][j]=t.taulell[i][j];
+            }
+        }
+        
+    }
+
+    public void setTorn(int jugador){
+        if (jugador <= 2 && jugador >= 1)
+            this.jugador = jugador;
     }
     public int getpos(int x,int y) {
         /* retorna el valor d'una casella
@@ -58,30 +77,30 @@ public class Tauler {
     public void setpos(int x,int y) {
         /* Afegeix una fitxa
          */
-            if(this.taulell[x][y]==0){//si es buida
-                this.taulell[x][y]=this.jugador;
-            }else{
-                Frame frame = new Frame();
-                JOptionPane.showMessageDialog(frame, "Jugador"+ this.jugador +" fa un moviment no valid!");
-            }
+        if(this.taulell[x][y]==0){//si es buida
+            this.taulell[x][y]=this.jugador;
+        }else{
+            Frame frame = new Frame();
+            JOptionPane.showMessageDialog(frame, "Jugador"+ this.jugador +" fa un moviment no valid!");
+        }
+    }
+
+    public int preguntaEntrada(){
+        Scanner keyboard = new Scanner(System.in);
+        System.out.println("Entra la columna a la que vols tirar");
+        return keyboard.nextInt();
     }
 
     public boolean Step() {
-        boolean acabat=false;
         if (this.jugador==1){
-            int[] tir=jugador1.tirada();
-            setpos(tir[0],tir[1]);
-            acabat=fi();
+            jugador1.tirada();
             this.jugador=2;
-            
+
         }else{
-            int[] tir=jugador2.tirada();
-            setpos(tir[0],tir[1]);
-            acabat=fi();
+            jugador2.tirada(preguntaEntrada());
             this.jugador=1;
         }
-        //retornem true si falten passos de simulació
-        return acabat;
+        return fi();
     }
 
     public double getX() {
@@ -98,6 +117,18 @@ public class Tauler {
          * es la (dimx,dimy)
          */
         return dimy;
+    }
+    
+    public Move[] generarMovimentsPossibles(){
+        int tableWidth = (int) this.getX();
+        Move[] moviments = new Move[tableWidth];
+        for(int col = 0; col < tableWidth; col++){
+            int row = (int) (this.getY()-1);
+            while (row > 0 && this.getpos(col, row) != 0)
+                row--;
+            moviments[col] = new Move(col,row);
+        }
+        return moviments;
     }
 
     private boolean fi() {
@@ -180,7 +211,7 @@ public class Tauler {
         }
         
         //fi de joc no queden caselles lliures
-         for(int i=0;i<this.getX();i++){
+        for(int i=0;i<this.getX();i++){
             for(int j=0;j<this.getY();j++){
                 if (this.getpos(i,j) == 0){
                     return false;
@@ -190,5 +221,68 @@ public class Tauler {
         Frame frame2 = new Frame();
          JOptionPane.showMessageDialog(frame2, "Empat!");
         return true;
+    }
+    
+    public int heuristic(){
+        int valor = 0,
+            jugadorActual = this.jugador;
+
+        for(int i = 0; i < this.getX(); i++){
+            if (this.getpos(i,(int) this.getY()-1) == 0)
+                break;
+            for(int j = 0; j < this.getY(); j++){
+                if (this.getpos(i, j) == jugadorActual) {
+                    valor += valorarPos(i, j);
+                }
+            }
+        }
+        return valor;
+    }
+    
+    private int valorarPos(int row, int col){
+        int i, j;
+        int valorTotal = 1;
+
+        /* Vertical superior */
+        i = row; j = col;
+        while (i > 0 && this.getpos(--i, j) == this.jugador)
+            valorTotal++;
+
+        /* Vertical inferior */
+        i = row; j = col;
+        while (i < this.getX()-1 && this.getpos(++i, j) == this.jugador)
+            valorTotal++;
+
+        /* Horitzontal esquerre */
+        i = row; j = col;
+        while (j > 0 && this.getpos(i, --j) == this.jugador)
+            valorTotal++;
+
+        /* Horitzontal dreta */
+        i = row; j = col;
+        while (j < this.getY()-1 && this.getpos(i, ++j) == this.jugador)
+            valorTotal++;
+
+        /* Diagonal superior esquerre */
+        i = row; j = col;
+        while (j > 0 && i > 0 && this.getpos(--i, --j) == this.jugador)
+            valorTotal++;
+
+        /* Diagonal superior dreta */
+        i = row; j = col;
+        while (j < this.getY()-1 && i > 0 && this.getpos(--i, ++j) == this.jugador)
+            valorTotal++;
+
+        /* Diagonal inferior esquerre */
+        i = row; j = col;
+        while (j > 0 && i < this.getX()-1 && this.getpos(++i, --j) == this.jugador)
+            valorTotal++;
+
+        /* Diagonal inferior dreta */
+        i = row; j = col;
+        while (j < this.getY()-1 && i < this.getX()-1 && this.getpos(++i, ++j) == this.jugador)
+            valorTotal++;
+
+        return valorTotal;
     }
 }

@@ -9,22 +9,17 @@ package connecta4;
  * @author Usuari
  */
 public class Player2 {
+
     private Tauler meutaulell;
+
     Player2(Tauler entrada){
         meutaulell = entrada;
     }
-    public int[] tirada(){
-        int x,y;
-        //busco una posicio buida
-        for(int i=0;i<meutaulell.getX();i++){
-            for(int j=0;j<meutaulell.getY();j++){
-                if (meutaulell.getpos(i,j) == 0){
-                    return new int[]{i,j}; 
-                }
-            }
-        }
-        
-        //Un retorn per defecte
-        return new int[]{1,1};  
+
+    public void tirada(int col){
+        int row = (int) meutaulell.getY()-1;
+        while (row > 0 && meutaulell.getpos(col, row) != 0)
+            row--;
+        meutaulell.setpos(col, row);
     }
 }
