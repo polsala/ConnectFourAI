@@ -85,7 +85,7 @@ public class Tauler {
         }
     }
 
-    public int preguntaEntrada(){
+    private int preguntaEntrada(){
         Scanner keyboard = new Scanner(System.in);
         System.out.println("Entra la columna a la que vols tirar");
         return keyboard.nextInt();
@@ -104,18 +104,10 @@ public class Tauler {
     }
 
     public double getX() {
-        /*Metode que retorna la dimenció X del taulell de simulació, la
-         * coordenada (0,0) es la de dalt a l'esquerra i la de baix a la dreta
-         * es la (dimx,dimy)
-         */
         return dimx;
     }
 
     public double getY() {
-        /*Metode que retorna la dimenció X del taulell de simulació, la
-         * coordenada (0,0) es la de dalt a l'esquerra i la de baix a la dreta
-         * es la (dimx,dimy)
-         */
         return dimy;
     }
     
@@ -123,12 +115,16 @@ public class Tauler {
         int tableWidth = (int) this.getX();
         Move[] moviments = new Move[tableWidth];
         for(int col = 0; col < tableWidth; col++){
-            int row = (int) (this.getY()-1);
-            while (row > 0 && this.getpos(col, row) != 0)
-                row--;
-            moviments[col] = new Move(col,row);
+            moviments[col] = new Move(col,primeraFilaBuida(col));
         }
         return moviments;
+    }
+
+    public int primeraFilaBuida(int col){
+        int row = 0;
+        while (row < this.getY()-1 && this.getpos(col, row) != 0)
+            row++;
+        return row;
     }
 
     private boolean fi() {
