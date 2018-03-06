@@ -45,7 +45,8 @@ public class UI extends javax.swing.JFrame {
     //inicialització i posem l'icona d'exit
     public UI() {
         initComponents();
-        escena = new Tauler();
+
+        escena = new Tauler(preguntarProfunditat(), preguntarAlgorisme());
         initable();
         pinta();
         //Posem icona eXiT a la finestra
@@ -172,7 +173,7 @@ public class UI extends javax.swing.JFrame {
         
         //parem el timer si esta actiu!
         timer.stop();
-        escena = new Tauler();
+        escena = new Tauler(preguntarProfunditat(), preguntarAlgorisme());
          //L'escenari esta creat, inicialitsem la taula
          initable();
          pinta();
@@ -275,9 +276,33 @@ public class UI extends javax.swing.JFrame {
         }
 
         //posem el color
-       // jTable2.setBackground(Color.white);
+        jTable2.setBackground(Color.white);
 
         //posem les mides a les celles
         jTable2.setRowHeight(height);
+    }
+
+
+    private int preguntarProfunditat(){
+        int dificultat = 0;
+        while (!(dificultat <= 3 && dificultat >= 1)){
+            JFrame frame = new JFrame("Dificultat");
+            dificultat = Integer.parseInt(JOptionPane.showInputDialog(frame, "Quina dificultat vols? [1-3]\n " +
+                    "Atenció, el la dificultat 3 juntament amb l'algorisme Minimax pot " +
+                    "comportar temps d'espera alts."));
+        }
+        if (dificultat == 1)
+            return 4;
+        else if (dificultat == 2)
+            return 6;
+        else
+            return 9;
+    }
+
+    private char preguntarAlgorisme(){
+        String[] options = {"Minimax", "Alfa-Beta"};
+        int a = JOptionPane.showOptionDialog(null, "Quin algorisme vols usar?", "Algorisme",
+                JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
+        return a == 0 ? 'm' : 'a';
     }
 }

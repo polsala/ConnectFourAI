@@ -1,8 +1,10 @@
 package connecta4;
 
+import com.sun.org.apache.xpath.internal.SourceTree;
+
 import java.awt.Frame;
-import java.util.Scanner;
-import javax.swing.JOptionPane;
+import java.util.*;
+import javax.swing.*;
 /*
  * Es la classe que mantindra en memoria tot el nostre entorn de simulació.
  * Aqui és on trobarem les llistes de robots, bruticies, parets i la paperera 
@@ -28,12 +30,12 @@ public class Tauler {
     private Player2 jugador2;
 
 
-    public Tauler() {
+    public Tauler(int profunditat, char algorisme) {
         /*Constructor, inicialitza el tamany del taulell
          */
         //inicialitzem el tamany del taulell
-        this.dimx = 6;   // minim 4
-        this.dimy = 7; // minim 4
+        this.dimx = 7;   // minim 4
+        this.dimy = 6; // minim 4
         this.taulell =  new int[this.dimx][this.dimy];
         this.jugador=1;
         for(int i = 0; i != this.dimx; i++){
@@ -41,7 +43,7 @@ public class Tauler {
                 this.taulell[i][j]=0;
             }
         }
-        jugador1 = new Player1(this);
+        jugador1 = new Player1(this, profunditat, algorisme);
         jugador2 = new Player2(this);
         
     }
@@ -53,7 +55,7 @@ public class Tauler {
         this.taulell = new int[this.dimx][this.dimy];
         this.jugador = t.jugador;
 
-        jugador1 = new Player1(this);
+        jugador1 = new Player1(this, t.jugador1.getProfunditat(), t.jugador1.getAlgorisme());
         jugador2 = new Player2(this);
 
         for(int i = 0; i != this.dimx; i++){
@@ -86,9 +88,16 @@ public class Tauler {
     }
 
     private int preguntaEntrada(){
-        Scanner keyboard = new Scanner(System.in);
-        System.out.println("Entra la columna a la que vols tirar");
-        return keyboard.nextInt();
+        char minCol = 'A', maxCol = (char) ('A'+this.dimx-1);
+        char minColMinuscula = 'a', maxColMinuscula = (char) ('a'+this.dimx-1);
+        char col = ' ';
+        while (!(col <= maxCol && col >= minCol) && !(col <= maxColMinuscula && col >= minColMinuscula)){
+            JFrame frame = new JFrame("Següent tirada");
+            col = (JOptionPane.showInputDialog(frame, "A quina col·lumna vols tirar? [A-"+maxCol+"]")).charAt(0);
+        }
+        if (col >= minColMinuscula && col <= maxColMinuscula)
+            return col-'a';
+        else return col-'A';
     }
 
     public boolean Step() {
@@ -109,22 +118,6 @@ public class Tauler {
 
     public double getY() {
         return dimy;
-    }
-    
-    public Move[] generarMovimentsPossibles(){
-        int tableWidth = (int) this.getX();
-        Move[] moviments = new Move[tableWidth];
-        for(int col = 0; col < tableWidth; col++){
-            moviments[col] = new Move(col,primeraFilaBuida(col));
-        }
-        return moviments;
-    }
-
-    public int primeraFilaBuida(int col){
-        int row = 0;
-        while (row < this.getY()-1 && this.getpos(col, row) != 0)
-            row++;
-        return row;
     }
 
     private boolean fi() {
@@ -223,62 +216,85 @@ public class Tauler {
         int valor = 0,
             jugadorActual = this.jugador;
 
-        for(int i = 0; i < this.getX(); i++){
-            if (this.getpos(i,(int) this.getY()-1) == 0)
-                break;
-            for(int j = 0; j < this.getY(); j++){
-                if (this.getpos(i, j) == jugadorActual) {
-                    valor += valorarPos(i, j);
+        for(int x = 0; x < this.getX(); x++){
+            for(int y = 0; y < this.getY(); y++){
+                if (this.getpos(x, y) == jugadorActual) {
+                    valor += valorarPos(x, y);
                 }
             }
         }
         return valor;
     }
     
-    private int valorarPos(int row, int col){
-        int i, j;
-        int valorTotal = 1;
+    private int valorarPos(int col, int row){
+        if (this.getpos(col, row) != 0)
+            return 0;
+        return valorarJugador(col, row, this.jugador) - valorarJugador(col, row, this.jugador%2+1);
+    }
+
+    private int valorarJugador(int col, int row, int jugador){
+        int x, y;
+        int valorTotal = 0,
+            valorComprovacio;
+
+        /* Vertical inferior*/
+        x = col; y = row; valorComprovacio = 0;
+        while (--y > 0 && this.getpos(x, y) == jugador)
+                valorComprovacio++;
+        valorTotal+=valorarComprovacio(valorComprovacio);
 
         /* Vertical superior */
-        i = row; j = col;
-        while (i > 0 && this.getpos(--i, j) == this.jugador)
-            valorTotal++;
-
-        /* Vertical inferior */
-        i = row; j = col;
-        while (i < this.getX()-1 && this.getpos(++i, j) == this.jugador)
-            valorTotal++;
-
-        /* Horitzontal esquerre */
-        i = row; j = col;
-        while (j > 0 && this.getpos(i, --j) == this.jugador)
-            valorTotal++;
-
-        /* Horitzontal dreta */
-        i = row; j = col;
-        while (j < this.getY()-1 && this.getpos(i, ++j) == this.jugador)
-            valorTotal++;
-
-        /* Diagonal superior esquerre */
-        i = row; j = col;
-        while (j > 0 && i > 0 && this.getpos(--i, --j) == this.jugador)
-            valorTotal++;
-
-        /* Diagonal superior dreta */
-        i = row; j = col;
-        while (j < this.getY()-1 && i > 0 && this.getpos(--i, ++j) == this.jugador)
-            valorTotal++;
+        x = col; y = row; valorComprovacio = 0;
+        while (++y < this.getY()-1 && this.getpos(x, y) == this.jugador)
+            valorComprovacio++;
+        valorTotal+=valorarComprovacio(valorComprovacio);
 
         /* Diagonal inferior esquerre */
-        i = row; j = col;
-        while (j > 0 && i < this.getX()-1 && this.getpos(++i, --j) == this.jugador)
-            valorTotal++;
+        x = col; y = row; valorComprovacio = 0;
+        while (--y > 0 && --x > 0 && this.getpos(x, y) == this.jugador)
+            valorComprovacio++;
+        valorTotal+=valorarComprovacio(valorComprovacio);
+
+        /* Diagonal superior esquerre */
+        x = col; y = row; valorComprovacio = 0;
+        while (++y < this.getY()-1 && --x > 0 && this.getpos(x, y) == this.jugador)
+            valorComprovacio++;
+        valorTotal+=valorarComprovacio(valorComprovacio);
 
         /* Diagonal inferior dreta */
-        i = row; j = col;
-        while (j < this.getY()-1 && i < this.getX()-1 && this.getpos(++i, ++j) == this.jugador)
-            valorTotal++;
+        x = col; y = row; valorComprovacio = 0;
+        while (--y > 0 && ++x < this.getX()-1 && this.getpos(x, y) == this.jugador)
+            valorComprovacio++;
+        valorTotal+=valorarComprovacio(valorComprovacio);
 
+        /* Diagonal superior dreta */
+        x = col; y = row; valorComprovacio = 0;
+        while (++y < this.getY()-1 && ++x < this.getX()-1 && this.getpos(x, y) == this.jugador)
+            valorComprovacio++;
+        valorTotal+=valorarComprovacio(valorComprovacio);
+
+        /* Horitzontal esquerre */
+        x = col; y = row; valorComprovacio = 0;
+        while (--x > 0 && this.getpos(x, y) == this.jugador)
+            valorComprovacio++;
+        valorTotal+=valorarComprovacio(valorComprovacio);
+
+        /* Horitzontal dreta */
+        x = col; y = row;
+        while (++x < this.getX()-1 && this.getpos(x, y) == this.jugador)
+            valorComprovacio++;
+        valorTotal+=valorarComprovacio(valorComprovacio);
         return valorTotal;
+    }
+
+    private int valorarComprovacio(int valorComprovacio){
+        switch (valorComprovacio){
+            case 3:
+                return valorComprovacio*10;
+            case 4:
+                return valorComprovacio*100;
+            default:
+                return valorComprovacio;
+        }
     }
 }

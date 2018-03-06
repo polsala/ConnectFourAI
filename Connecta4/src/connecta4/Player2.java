@@ -17,6 +17,9 @@ public class Player2 {
     }
 
     public void tirada(int col){
-        meutaulell.setpos(col, meutaulell.primeraFilaBuida(col));
+        int row = 0;
+        while (row < meutaulell.getY()-1 && meutaulell.getpos(col, row) != 0)
+            row++;
+        meutaulell.setpos(col, row);
     }
 }

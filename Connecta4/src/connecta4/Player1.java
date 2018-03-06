@@ -1,5 +1,7 @@
 package connecta4;
 
+import java.util.*;
+
 /**
  *
  * @author Amat Martínez Vilà
@@ -9,15 +11,42 @@ public class Player1 {
 
     private Tauler meutaulell;
     private int maxProfunditat;
+    private char algorisme;
 
-    Player1(Tauler entrada){
+    public class Move {
+        private int []pos;
+
+        Move(int x, int y){
+            this.pos = new int[]{x,y};
+        }
+        Move(){
+            this.pos = new int[]{0,0};
+        }
+
+        public int getX(){
+            return this.pos[0];
+        }
+
+        public int getY(){
+            return this.pos[1];
+        }
+    }
+
+    Player1(Tauler entrada, int profunditat, char algorisme){
         meutaulell = entrada;
-        maxProfunditat = 4;
+        maxProfunditat = profunditat;
+        this.algorisme = algorisme;
     }
 
     public void tirada(){
-//        alfaBeta(0, Integer.MIN_VALUE, Integer.MAX_VALUE)
-        miniMax(meutaulell,0);
+        switch (this.algorisme){
+            case 'a':
+                alfaBeta(meutaulell, 0, Integer.MIN_VALUE, Integer.MAX_VALUE);
+                break;
+            case 'm':
+                miniMax(meutaulell,0);
+                break;
+        }
     }
 
     private int miniMax(Tauler taulerModificat, int profunditat){
@@ -42,48 +71,49 @@ public class Player1 {
     }
 
     private int movimentMinim(Tauler taulerModificat, int profunditat){
+        
+        Move millorMoviment = new Move();
+        int millorHeuristic = Integer.MAX_VALUE;
 
-        int millorMoviment = -1,
-            movimentActual = 0,
-            millorHeuristic = Integer.MAX_VALUE;
+        LinkedList<Move> movimentsPossibles = generarMovimentsPossibles(taulerModificat);
 
-        Move[] movimentsPossibles = taulerModificat.generarMovimentsPossibles();
-
-        if (movimentsPossibles.length == 0)
+        if (movimentsPossibles.isEmpty())
             return -1;
-
-        for (Move movimentPossible : movimentsPossibles){
+        
+        Move movimentPossible;
+        while(!movimentsPossibles.isEmpty()){
+            movimentPossible = movimentsPossibles.poll();
             if (taulerModificat.getpos(movimentPossible.getX(), movimentPossible.getY()) == 0) {
                 Tauler taulerAux = new Tauler(taulerModificat);
                 taulerAux.setTorn(profunditat % 2 + 1);
                 taulerAux.setpos(movimentPossible.getX(), movimentPossible.getY());
                 int valorHeuristic = miniMax(taulerAux, profunditat);
-
+                
                 if (valorHeuristic < millorHeuristic) {
                     millorHeuristic = valorHeuristic;
-                    millorMoviment = movimentActual;
+                    millorMoviment = movimentPossible;
                 }
             }
-            movimentActual++;
         }
         taulerModificat.setpos(
-                movimentsPossibles[millorMoviment].getX(),
-                movimentsPossibles[millorMoviment].getY()
+                millorMoviment.getX(),
+                millorMoviment.getY()
         );
         return millorHeuristic;
     }
 
     private int movimentMax(Tauler taulerModificat, int profunditat){
-        int indexMillorMoviment = -1,
-            indexMovimentActual = 0,
-            millorHeuristic = Integer.MIN_VALUE;
+        Move millorMoviment = new Move();
+        int millorHeuristic = Integer.MIN_VALUE;
 
-        Move[] movimentsPossibles = taulerModificat.generarMovimentsPossibles();
+        Queue<Move> movimentsPossibles = generarMovimentsPossibles(taulerModificat);
 
-        if (movimentsPossibles.length == 0)
+        if (movimentsPossibles.isEmpty())
             return -1;
 
-        for (Move movimentPossible : movimentsPossibles){
+        Move movimentPossible;
+        while(!movimentsPossibles.isEmpty()){
+            movimentPossible = movimentsPossibles.poll();
             if (taulerModificat.getpos(movimentPossible.getX(), movimentPossible.getY()) == 0) {
 
                 Tauler taulerAux = new Tauler(taulerModificat);
@@ -93,54 +123,136 @@ public class Player1 {
 
                 if (valorHeuristic > millorHeuristic) {
                     millorHeuristic = valorHeuristic;
-                    indexMillorMoviment = indexMovimentActual;
+                    millorMoviment = movimentPossible;
                 }
-
             }
-            indexMovimentActual++;
         }
         taulerModificat.setpos(
-                movimentsPossibles[indexMillorMoviment].getX(),
-                movimentsPossibles[indexMillorMoviment].getY()
+                millorMoviment.getX(),
+                millorMoviment.getY()
         );
         return millorHeuristic;
     }
 
-    private int alfaBeta(int nivell, int alfa, int beta){
-        if(nivell==this.maxProfunditat){
-            return meutaulell.heuristic();
+
+    private int alfaBeta(Tauler taulerModificat, int profunditat, int alfa, int beta){
+
+        if(profunditat == this.maxProfunditat){
+            return taulerModificat.heuristic();
         }
-        else {
-            Move[] movimentsPossibles = meutaulell.generarMovimentsPossibles();
-            if (movimentsPossibles.length == 0)
-                return meutaulell.heuristic();
-            
-            int millorMoviment = -1, movimentActual = 0;
-            if (nivell % 2 == 0){  //Max
-                for (Move mov : movimentsPossibles){
-                    meutaulell.setpos(mov.getX(), mov.getY());
-                    int valor = alfaBeta(nivell++, alfa, beta);
-                    if (valor > alfa){
-                        alfa = valor;
-                        millorMoviment = movimentActual;
-                    } else {
-                        movimentActual++;
-//                        meutaulell.borraPos(mov.getX(), mov.getY());
-                    }
-                    if (alfa >= beta)
-                        break;
+
+        if (profunditat % 2 == 0) {  //Max
+            return movimentMaxAlfaBeta(taulerModificat, ++profunditat, alfa, beta);
+        } else { //Min
+            return movimentMinimAlfaBeta(taulerModificat, ++profunditat, alfa, beta);
+        }
+    }
+
+    private int movimentMaxAlfaBeta(Tauler taulerModificat, int profunditat, int alfa, int beta){
+
+        Move millorMoviment = null, movimentPossible;
+
+        Queue<Move> movimentsPossibles = generarMovimentsPossibles(taulerModificat);
+
+        if (movimentsPossibles.isEmpty())
+            return taulerModificat.heuristic();
+
+        while(!movimentsPossibles.isEmpty() && alfa < beta){
+
+            movimentPossible = movimentsPossibles.poll();
+            if (taulerModificat.getpos(movimentPossible.getX(), movimentPossible.getY()) == 0) {
+
+                Tauler taulerAux = new Tauler(taulerModificat);
+                taulerAux.setTorn(profunditat % 2 + 1);
+                taulerAux.setpos(
+                    movimentPossible.getX(),
+                    movimentPossible.getY()
+                );
+
+                int valorHeuristic = alfaBeta(taulerAux, profunditat, alfa, beta);
+
+                if (valorHeuristic > alfa) {
+                    alfa = valorHeuristic;
+                    millorMoviment = movimentPossible;
                 }
-                return alfa;
-            } else { //Min
-                for (Move fill : movimentsPossibles){
-                    int valor = alfaBeta(nivell++, alfa, beta);
-                    if (valor < beta)
-                        beta = valor;
-                    if (alfa >= beta)
-                        break;
-                }
-                return beta;
             }
+
         }
+        if (millorMoviment != null)
+            taulerModificat.setpos(
+                millorMoviment.getX(),
+                millorMoviment.getY()
+            );
+        return alfa;
+    }
+
+    private int movimentMinimAlfaBeta(Tauler taulerModificat, int profunditat, int alfa, int beta){
+
+        Move millorMoviment = null, movimentPossible;
+
+        LinkedList<Move> movimentsPossibles = generarMovimentsPossibles(taulerModificat);
+
+        if (movimentsPossibles.isEmpty())
+            return taulerModificat.heuristic();
+
+        while(!movimentsPossibles.isEmpty() && alfa < beta){
+
+            movimentPossible = movimentsPossibles.poll();
+            if (taulerModificat.getpos(movimentPossible.getX(), movimentPossible.getY()) == 0) {
+
+                Tauler taulerAux = new Tauler(taulerModificat);
+                taulerAux.setTorn(profunditat % 2 + 1);
+                taulerAux.setpos(
+                    movimentPossible.getX(),
+                    movimentPossible.getY()
+                );
+
+                int valorHeuristic = alfaBeta(taulerAux, profunditat, alfa, beta);
+
+                if (valorHeuristic < beta) {
+                    beta = valorHeuristic;
+                    millorMoviment = movimentPossible;
+                }
+
+            }
+
+        }
+        if (millorMoviment != null)
+            taulerModificat.setpos(
+                millorMoviment.getX(),
+                millorMoviment.getY()
+            );
+        return beta;
+    }
+
+    public LinkedList<Move> generarMovimentsPossibles(Tauler tauler){
+        int tableWidth = (int) tauler.getX();
+
+        LinkedList<Move> moviments = new LinkedList<Move>();
+        ArrayList<Integer> columnesAleatories = new ArrayList<Integer>();
+
+        for (int i = 0; i < tableWidth; i++)
+            columnesAleatories.add(i);
+
+        Collections.shuffle(columnesAleatories);
+        for (int col: columnesAleatories){
+            moviments.add(new Move(col, primeraFilaBuida(tauler, col)));
+        }
+        return moviments;
+    }
+
+    public int primeraFilaBuida(Tauler tauler, int col){
+        int row = 0;
+        while (row < tauler.getY()-1 && tauler.getpos(col, row) != 0)
+            row++;
+        return row;
+    }
+
+    public int getProfunditat() {
+        return maxProfunditat;
+    }
+
+    public char getAlgorisme() {
+        return algorisme;
     }
 }
