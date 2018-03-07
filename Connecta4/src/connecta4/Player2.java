@@ -73,9 +73,33 @@ public class Player2 {
         
         public int four_connected(int x, int y, int i, int j){
             int res_weight = 1;
+            int aux_x = x;
+            int aux_y = y;
+            int aux_colour = _board.getpos(x, y);
             
-            
-            return 1;
+            for(int k = 1; k < 4; k++){
+                int _x_i_k = x+i*k;
+                int _y_j_k = y+j*k;
+                
+                if(_x_i_k < 0 || _y_j_k < 0 || _x_i_k >= _columns_ || _y_j_k > _rows_){
+                    return 0;
+                }
+                
+                int iter_colour = _board.getpos(_x_i_k, _y_j_k);
+                
+                if(iter_colour == aux_colour){
+                    res_weight++;
+                }else if(iter_colour == 0){
+                    return 0;
+                }else{
+                    for(int w = _y_j_k; w >=0; w--){
+                        if(_board.getpos(_x_i_k, w) == 0) res_weight--;
+                    }
+                }
+            }
+            if (res_weight == 4) return 100;
+            if (res_weight < 4) return -100;
+            return res_weight;
         }
         
         public int possible_moves(int i, int j)
