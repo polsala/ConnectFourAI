@@ -71,6 +71,11 @@ public class Player2 {
             
         }
         
+        public int best_randomizer(){
+            int random = (int)(Math.random() * 100) % _bestMoves.size();
+            return _bestMoves.get(random);
+        }
+        
         public int four_connected(int x, int y, int i, int j){
             int res_weight = 1;
             int aux_x = x;
@@ -152,6 +157,7 @@ public class Player2 {
                 // todo check
                 _preRow = row;
                 _preCol = col;
+                _prePlayer = _board.getpos(row, col);
             
             }
         }
@@ -176,6 +182,8 @@ public class Player2 {
                     insert_in_board_heuristic(prov_moves.get(i),0);
                     Tree child = new Tree(_board, _depth+1);
                     // todo _board.setpos(x,y,0)
+                    _prePlayer = 0;
+                    _board.forcepos(_preRow, _preCol);
                     
                     if (i == 1){
                         _bestMoves.add(prov_moves.get(i));
@@ -203,13 +211,25 @@ public class Player2 {
             }
         }
     }           
+    
+    
+    
     private Tauler meutaulell;
     Player2(Tauler entrada){
         meutaulell = entrada;
     }
-    public int[] tirada(){
+    
+    
+    public int[] minimax()
+    {
+        Tree tree = new Tree(meutaulell, 0);
+        return new int[]{tree.best_randomizer(),0};//[tree.getX()][0];
+    }
+    
+    public int[] tirada() throws NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
         int x,y;
         //busco una posicio buida
+        /*
         for(int i=0;i<meutaulell.getX();i++){
             for(int j=0;j<meutaulell.getY();j++){
                 if (meutaulell.getpos(i,j) == 0){
@@ -217,8 +237,18 @@ public class Player2 {
                 }
             }
         }
+        */
+        //meutaulell.setpos(1, 1);
+        //return new int[]{1,0}; 
+        //int[] minimax = minimax();
+        //return new int[]{1,0}; 
+        return minimax();
+        //return minimax();
+   
+        
+        
         
         //Un retorn per defecte
-        return new int[]{1,1};  
+        //return new int[]{1,1};  
     }
 }
