@@ -14,7 +14,26 @@ import java.util.Random;
  * @author Exor_P
  */
 
-
+class FakeBoard{
+    private int[][] _fakeBoard;
+    private int _rows;
+    private int _columns;
+    
+    public FakeBoard(int[][] board){
+        this._fakeBoard = board;
+        this._rows = board[0].length;
+        this._columns = board.length;
+    }
+    
+    public int getpos(int x, int y){return _fakeBoard[x][y];}
+    
+    public void setpos(int x, int y, int colour){_fakeBoard[x][y] = colour;}
+    
+    public int rows(){return _rows;}
+    
+    public int cols(){return _columns;}
+    
+}
 
 public class Player2 {
     static int _maxDepth_ = 8;
@@ -24,7 +43,7 @@ public class Player2 {
     
     private class Tree { 
         public int weight;
-        private Tauler _board;
+        private FakeBoard _board;
         private ArrayList<Integer> _bestMoves;
         private int _preRow;
         private int _preCol;
@@ -32,13 +51,26 @@ public class Player2 {
         private int _depth;
         
         public Tree(Tauler board, int depth){
-            this._board = board;
+            this._board = new FakeBoard(board.getTaulell());
             this._bestMoves = new ArrayList<>();
             this._depth = depth;
             this.weight = get_weight();
             if (_rows_ != 0) {
-                _rows_ = int.class.cast(_board.getX());
-                _columns_ = int.class.cast(_board.getY());
+                _rows_ = _board.rows();
+                _columns_ = _board.cols();
+            }
+            insert_in_board_heuristic(_rows_, _columns_);
+            
+        }
+        
+        public Tree(FakeBoard board, int depth){
+            this._board = board;//todo!!!!!!!!
+            this._bestMoves = new ArrayList<>();
+            this._depth = depth;
+            this.weight = get_weight();
+            if (_rows_ != 0) {
+                _rows_ = _board.rows();
+                _columns_ = _board.cols();
             }
             insert_in_board_heuristic(_rows_, _columns_);
             
@@ -122,10 +154,10 @@ public class Player2 {
                 }
                 if (_depth % 2 == 0){
                     //1
-                    _board.setpos(row, col);
+                    _board.setpos(row, col, 1);
                 }else{
                     //2
-                    _board.setpos(row, col);
+                    _board.setpos(row, col, 2);
                 }
                 // todo check
                 _preRow = row;
@@ -156,7 +188,7 @@ public class Player2 {
                     Tree child = new Tree(_board, _depth+1);
                     // todo _board.setpos(x,y,0)
                     _prePlayer = 0;
-                    _board.forcepos(_preRow, _preCol);
+                    _board.setpos(_preRow, _preCol, 0); //forcepos(_preRow, _preCol);
                     
                     if (i == 1){
                         _bestMoves.add(prov_moves.get(i));
@@ -227,23 +259,3 @@ public class Player2 {
 }
 
 
-class FakeBoard{
-    private int[][] _fakeBoard;
-    private int _rows;
-    private int _columns;
-    
-    public FakeBoard(int[][] board){
-        this._fakeBoard = board;
-        this._rows = board[0].length;
-        this._columns = board.length;
-    }
-    
-    public int getpos(int x, int y){return _fakeBoard[x][y];}
-    
-    public void setpos(int x, int y, int colour){_fakeBoard[x][y] = colour;}
-    
-    public int rows(){return _rows;}
-    
-    public int cols(){return _columns;}
-    
-}
