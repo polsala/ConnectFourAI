@@ -22,34 +22,7 @@ public class Player2 {
     static int _rows_ = 0;
     static int _columns_ = 0;
     
-    private static Object cloneObject(Object obj){
-        try{
-            Object clone = obj.getClass().newInstance();
-            for (Field field : obj.getClass().getDeclaredFields()) {
-                field.setAccessible(true);
-                if(field.get(obj) == null || Modifier.isFinal(field.getModifiers())){
-                    continue;
-                }
-                if(field.getType().isPrimitive() || field.getType().equals(String.class)
-                        || field.getType().getSuperclass().equals(Number.class)
-                        || field.getType().equals(Boolean.class)){
-                    field.set(clone, field.get(obj));
-                }else{
-                    Object childObj = field.get(obj);
-                    if(childObj == obj){
-                        field.set(clone, clone);
-                    }else{
-                        field.set(clone, cloneObject(field.get(obj)));
-                    }
-                }
-            }
-            return clone;
-        }catch(Exception e){
-            return null;
-        }
-    }
-    
-    private class Tree {
+    private class Tree { 
         public int weight;
         private Tauler _board;
         private ArrayList<Integer> _bestMoves;
@@ -226,7 +199,7 @@ public class Player2 {
         return new int[]{tree.best_randomizer(),0};//[tree.getX()][0];
     }
     
-    public int[] tirada() throws NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
+    public int[] tirada(){
         int x,y;
         //busco una posicio buida
         /*
@@ -251,4 +224,26 @@ public class Player2 {
         //Un retorn per defecte
         //return new int[]{1,1};  
     }
+}
+
+
+class FakeBoard{
+    private int[][] _fakeBoard;
+    private int _rows;
+    private int _columns;
+    
+    public FakeBoard(int[][] board){
+        this._fakeBoard = board;
+        this._rows = board[0].length;
+        this._columns = board.length;
+    }
+    
+    public int getpos(int x, int y){return _fakeBoard[x][y];}
+    
+    public void setpos(int x, int y, int colour){_fakeBoard[x][y] = colour;}
+    
+    public int rows(){return _rows;}
+    
+    public int cols(){return _columns;}
+    
 }

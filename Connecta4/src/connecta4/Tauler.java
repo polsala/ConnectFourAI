@@ -49,6 +49,11 @@ public class Tauler {
         /*Retorna el taulell*/
         return this.taulell;
     }
+    public int getpos(int x,int y) {
+        /* retorna el valor d'una casella
+         */
+        return this.taulell[x][y];
+    }
     
     public void forcepos(int x,int y){
         this.taulell[x][y]=0;
