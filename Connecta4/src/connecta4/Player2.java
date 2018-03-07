@@ -40,6 +40,8 @@ public class Player2 {
     final static int _range_ = 100;
     static int _rows_ = 0;
     static int _columns_ = 0;
+    static int _mineColour_;
+    static int _oponentColour_;
     
     private class Tree { 
         public int weight;
@@ -55,12 +57,12 @@ public class Player2 {
             this._bestMoves = new ArrayList<>();
             this._depth = depth;
             this.weight = get_weight();
-            if (_rows_ != 0) {
+            if (_rows_ == 0) {
                 _rows_ = _board.rows();
                 _columns_ = _board.cols();
             }
             insert_in_board_heuristic(_rows_, _columns_);
-            
+            //System.out.println(_rows_);
         }
         
         public Tree(FakeBoard board, int depth){
@@ -68,7 +70,7 @@ public class Player2 {
             this._bestMoves = new ArrayList<>();
             this._depth = depth;
             this.weight = get_weight();
-            if (_rows_ != 0) {
+            if (_rows_ == 0) {
                 _rows_ = _board.rows();
                 _columns_ = _board.cols();
             }
@@ -77,7 +79,9 @@ public class Player2 {
         }
         
         public int best_randomizer(){
-            int random = (int)(Math.random() * 100) % _bestMoves.size();
+            int factor = _bestMoves.size();
+            //if (factor == 0) return 0;
+            int random = (int)(Math.random() * 100) % factor;
             return _bestMoves.get(random);
         }
         
@@ -136,7 +140,7 @@ public class Player2 {
                     
                     if (colour != 0){
                         // todo reviw
-                        if (colour == 1){
+                        if (colour == _mineColour_){
                             res_weight += possible_moves(i, j) * (_maxDepth_ - _depth);
                         }else{
                             res_weight -= possible_moves(i, j) * (_maxDepth_ - _depth);
@@ -154,10 +158,10 @@ public class Player2 {
                 }
                 if (_depth % 2 == 0){
                     //1
-                    _board.setpos(row, col, 1);
+                    _board.setpos(row, col, _mineColour_);
                 }else{
                     //2
-                    _board.setpos(row, col, 2);
+                    _board.setpos(row, col, _oponentColour_);
                 }
                 // todo check
                 _preRow = row;
@@ -186,7 +190,6 @@ public class Player2 {
                 for (int i = 0; i < prov_moves.size(); i++){
                     insert_in_board_heuristic(prov_moves.get(i),0);
                     Tree child = new Tree(_board, _depth+1);
-                    // todo _board.setpos(x,y,0)
                     _prePlayer = 0;
                     _board.setpos(_preRow, _preCol, 0); //forcepos(_preRow, _preCol);
                     
@@ -201,7 +204,7 @@ public class Player2 {
                         }else if (weight == child.weight){
                             _bestMoves.add(prov_moves.get(i));
                         }
-                    }else if(_depth % 2 == 0){
+                    }else if(_depth % 2 == 1){
                         if (weight > child.weight){
                             _bestMoves.clear();
                             _bestMoves.add(prov_moves.get(i));
@@ -222,6 +225,14 @@ public class Player2 {
     private Tauler meutaulell;
     Player2(Tauler entrada){
         meutaulell = entrada;
+        if (this.getClass().getName().endsWith("1")){
+            _mineColour_ = 1;
+            _oponentColour_ = 2;
+        }else{
+            _mineColour_ = 2;
+            _oponentColour_ = 1;
+        }
+        
     }
     
     
