@@ -67,12 +67,50 @@ public class Player2 {
                 _rows_ = int.class.cast(_board.getX());
                 _columns_ = int.class.cast(_board.getY());
             }
-            
+            insert_in_board_heuristic(_rows_, _columns_);
             
         }
         
-        int get_weight(){
+        public int four_connected(int x, int y, int i, int j){
+            int res_weight = 1;
+            
+            
             return 1;
+        }
+        
+        public int possible_moves(int i, int j)
+	{
+		int res_nMoves = 0;
+		res_nMoves += four_connected(i, j, -1, -1);
+		res_nMoves += four_connected(i, j, -1, 0);
+		res_nMoves += four_connected(i, j, -1, 1);
+		res_nMoves += four_connected(i, j, 0, -1);
+		res_nMoves += four_connected(i, j, 0, 1);
+		res_nMoves += four_connected(i, j, 1, -1);
+		res_nMoves += four_connected(i, j, 1, 0);
+		res_nMoves += four_connected(i, j, 1, 1);
+		
+		return res_nMoves;
+	}
+
+        
+        int get_weight(){
+            int res_weight = 0;
+            for(int j = 0; j < _rows_; j++){
+                for(int i = 0; i < _columns_; i++){
+                    int colour = _board.getpos(i, j);
+                    
+                    if (colour != 0){
+                        // todo reviw
+                        if (colour == 1){
+                            res_weight += possible_moves(i, j) * (_maxDepth_ - _depth);
+                        }else{
+                            res_weight -= possible_moves(i, j) * (_maxDepth_ - _depth);
+                        }
+                    }
+                }
+            }
+            return res_weight;
         }
         
         private void insert_in_board_heuristic(int row, int col){
