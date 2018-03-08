@@ -45,7 +45,7 @@ class FakeBoard{
 }
 
 public class Player2 {
-    static int _maxDepth_ = 8;
+    static int _maxDepth_ = 4;
     final static int _range_ = 100;
     static int _rows_ = 0;
     static int _columns_ = 0;
@@ -88,6 +88,15 @@ public class Player2 {
             set_posibilities();
             //insert_in_board_heuristic(_rows_, _columns_);
             
+        }
+        
+        public int[] res(){
+            int x = best_randomizer();
+            int y = 0;
+            while(_board.getpos(x, y) != 0){
+                y++;
+            }
+            return new int[]{x, y};
         }
         
         public int best_randomizer(){
@@ -217,6 +226,7 @@ public class Player2 {
                 _preRow = x;
                 _preCol = y;
                 _prePlayer = _board.getpos(x, y);
+                System.out.println(_board);
             
             }else{
                 while(y < _rows_ && _board.getpos(x, y) != 0){
@@ -322,7 +332,7 @@ public class Player2 {
     public int[] minimax()
     {
         Tree tree = new Tree(meutaulell, 0);
-        return new int[]{tree.best_randomizer(),0};//[tree.getX()][0];
+        return tree.res();
     }
     
     public int[] tirada(){
