@@ -122,179 +122,97 @@ public class Tauler {
 
     private boolean fi() {
         //si ha acabat el joc retornar true altrament false
-        
+
         //horitzontal
-        for(int i=0;i<this.getX()-3;i++){
-            for(int j=0;j<this.getY();j++){
-                if (this.getpos(i,j) == 1){
-                    if(this.getpos(i+1,j) == 1&&this.getpos(i+2,j) == 1&&this.getpos(i+3,j) == 1){
+        for (int i = 0; i < this.getX() - 3; i++) {
+            for (int j = 0; j < this.getY(); j++) {
+                if (this.getpos(i, j) == 1) {
+                    if (this.getpos(i + 1, j) == 1 && this.getpos(i + 2, j) == 1 && this.getpos(i + 3, j) == 1) {
                         Frame frame = new Frame();
                         JOptionPane.showMessageDialog(frame, "Guanya jugador1! (horitzontal)");
                         return true;
                     }
-                }else if (this.getpos(i,j) == 2){
-                    if(this.getpos(i+1,j) == 2&&this.getpos(i+2,j) == 2&&this.getpos(i+3,j) == 2){
+                } else if (this.getpos(i, j) == 2) {
+                    if (this.getpos(i + 1, j) == 2 && this.getpos(i + 2, j) == 2 && this.getpos(i + 3, j) == 2) {
                         Frame frame = new Frame();
                         JOptionPane.showMessageDialog(frame, "Guanya jugador2! (horitzontal)");
                         return true;
-                    }                
-                }               
+                    }
+                }
             }
         }
-        
+
         //vertical
-        for(int i=0;i<this.getX();i++){
-            for(int j=0;j<this.getY()-3;j++){
-                if (this.getpos(i,j) == 1){
-                    if(this.getpos(i,j+1) == 1&&this.getpos(i,j+2) == 1&&this.getpos(i,j+3) == 1){
+        for (int i = 0; i < this.getX(); i++) {
+            for (int j = 0; j < this.getY() - 3; j++) {
+                if (this.getpos(i, j) == 1) {
+                    if (this.getpos(i, j + 1) == 1 && this.getpos(i, j + 2) == 1 && this.getpos(i, j + 3) == 1) {
                         Frame frame = new Frame();
                         JOptionPane.showMessageDialog(frame, "Guanya jugador1! (vertical)");
                         return true;
                     }
-                }else if (this.getpos(i,j) == 2){
-                    if(this.getpos(i,j+1) == 2&&this.getpos(i,j+2) == 2&&this.getpos(i,j+3) == 2){
+                } else if (this.getpos(i, j) == 2) {
+                    if (this.getpos(i, j + 1) == 2 && this.getpos(i, j + 2) == 2 && this.getpos(i, j + 3) == 2) {
                         Frame frame = new Frame();
                         JOptionPane.showMessageDialog(frame, "Guanya jugador2! (vertical)");
                         return true;
-                    }                
-                }               
+                    }
+                }
             }
         }
-        
+
         //diagonal 1
-        for(int i=0;i<this.getX()-3;i++){
-            for(int j=0;j<this.getY()-3;j++){
-                if (this.getpos(i,j) == 1){
-                    if(this.getpos(i+1,j+1) == 1&&this.getpos(i+2,j+2) == 1&&this.getpos(i+3,j+3) == 1){
+        for (int i = 0; i < this.getX() - 3; i++) {
+            for (int j = 0; j < this.getY() - 3; j++) {
+                if (this.getpos(i, j) == 1) {
+                    if (this.getpos(i + 1, j + 1) == 1 && this.getpos(i + 2, j + 2) == 1 && this.getpos(i + 3, j + 3) == 1) {
                         Frame frame = new Frame();
                         JOptionPane.showMessageDialog(frame, "Guanya jugador1! (diagonal 1)");
                         return true;
                     }
-                }else if (this.getpos(i,j) == 2){
-                    if(this.getpos(i+1,j) == 2&&this.getpos(i+2,j+2) == 2&&this.getpos(i+3,j+3) == 2){
+                } else if (this.getpos(i, j) == 2) {
+                    if (this.getpos(i + 1, j) == 2 && this.getpos(i + 2, j + 2) == 2 && this.getpos(i + 3, j + 3) == 2) {
                         Frame frame = new Frame();
                         JOptionPane.showMessageDialog(frame, "Guanya jugador2! (diagonal 1)");
                         return true;
-                    }                
-                }               
+                    }
+                }
             }
         }
-        
+
         //diagonal 2
-        for(int i=0;i<this.getX()-3;i++){
-            for(int j=3;j<this.getY();j++){
-                if (this.getpos(i,j) == 1){
-                    if(this.getpos(i+1,j-1) == 1&&this.getpos(i+2,j-2) == 1&&this.getpos(i+3,j-3) == 1){
+        for (int i = 0; i < this.getX() - 3; i++) {
+            for (int j = 3; j < this.getY(); j++) {
+                if (this.getpos(i, j) == 1) {
+                    if (this.getpos(i + 1, j - 1) == 1 && this.getpos(i + 2, j - 2) == 1 && this.getpos(i + 3, j - 3) == 1) {
                         Frame frame = new Frame();
                         JOptionPane.showMessageDialog(frame, "Guanya jugador1! (diagonal 2)");
                         return true;
                     }
-                }else if (this.getpos(i,j) == 2){
-                    if(this.getpos(i+1,j-1) == 2&&this.getpos(i+2,j-2) == 2&&this.getpos(i+3,j-3) == 2){
+                } else if (this.getpos(i, j) == 2) {
+                    if (this.getpos(i + 1, j - 1) == 2 && this.getpos(i + 2, j - 2) == 2 && this.getpos(i + 3, j - 3) == 2) {
                         Frame frame = new Frame();
                         JOptionPane.showMessageDialog(frame, "Guanya jugador2! (diagonal 2)");
                         return true;
-                    }                
-                }               
+                    }
+                }
             }
         }
-        
+
         //fi de joc no queden caselles lliures
-        for(int i=0;i<this.getX();i++){
-            for(int j=0;j<this.getY();j++){
-                if (this.getpos(i,j) == 0){
+        for (int i = 0; i < this.getX(); i++) {
+            for (int j = 0; j < this.getY(); j++) {
+                if (this.getpos(i, j) == 0) {
                     return false;
                 }
             }
         }
         Frame frame2 = new Frame();
-         JOptionPane.showMessageDialog(frame2, "Empat!");
+        JOptionPane.showMessageDialog(frame2, "Empat!");
         return true;
     }
-    
-    public int heuristic(){
-        int valor = 0,
-            jugadorActual = this.jugador;
 
-        for(int x = 0; x < this.getX(); x++){
-            for(int y = 0; y < this.getY(); y++){
-                if (this.getpos(x, y) == jugadorActual) {
-                    valor += valorarPos(x, y);
-                }
-            }
-        }
-        return valor;
-    }
-    
-    private int valorarPos(int col, int row){
-        if (this.getpos(col, row) != 0)
-            return 0;
-        return valorarJugador(col, row, this.jugador) - valorarJugador(col, row, this.jugador%2+1);
-    }
-
-    private int valorarJugador(int col, int row, int jugador){
-        int x, y;
-        int valorTotal = 0,
-            valorComprovacio;
-
-        /* Vertical inferior*/
-        x = col; y = row; valorComprovacio = 0;
-        while (--y > 0 && this.getpos(x, y) == jugador)
-                valorComprovacio++;
-        valorTotal+=valorarComprovacio(valorComprovacio);
-
-        /* Vertical superior */
-        x = col; y = row; valorComprovacio = 0;
-        while (++y < this.getY()-1 && this.getpos(x, y) == this.jugador)
-            valorComprovacio++;
-        valorTotal+=valorarComprovacio(valorComprovacio);
-
-        /* Diagonal inferior esquerre */
-        x = col; y = row; valorComprovacio = 0;
-        while (--y > 0 && --x > 0 && this.getpos(x, y) == this.jugador)
-            valorComprovacio++;
-        valorTotal+=valorarComprovacio(valorComprovacio);
-
-        /* Diagonal superior esquerre */
-        x = col; y = row; valorComprovacio = 0;
-        while (++y < this.getY()-1 && --x > 0 && this.getpos(x, y) == this.jugador)
-            valorComprovacio++;
-        valorTotal+=valorarComprovacio(valorComprovacio);
-
-        /* Diagonal inferior dreta */
-        x = col; y = row; valorComprovacio = 0;
-        while (--y > 0 && ++x < this.getX()-1 && this.getpos(x, y) == this.jugador)
-            valorComprovacio++;
-        valorTotal+=valorarComprovacio(valorComprovacio);
-
-        /* Diagonal superior dreta */
-        x = col; y = row; valorComprovacio = 0;
-        while (++y < this.getY()-1 && ++x < this.getX()-1 && this.getpos(x, y) == this.jugador)
-            valorComprovacio++;
-        valorTotal+=valorarComprovacio(valorComprovacio);
-
-        /* Horitzontal esquerre */
-        x = col; y = row; valorComprovacio = 0;
-        while (--x > 0 && this.getpos(x, y) == this.jugador)
-            valorComprovacio++;
-        valorTotal+=valorarComprovacio(valorComprovacio);
-
-        /* Horitzontal dreta */
-        x = col; y = row;
-        while (++x < this.getX()-1 && this.getpos(x, y) == this.jugador)
-            valorComprovacio++;
-        valorTotal+=valorarComprovacio(valorComprovacio);
-        return valorTotal;
-    }
-
-    private int valorarComprovacio(int valorComprovacio){
-        switch (valorComprovacio){
-            case 3:
-                return valorComprovacio*10;
-            case 4:
-                return valorComprovacio*100;
-            default:
-                return valorComprovacio;
-        }
+    public int getTornActual() {
+        return jugador;
     }
 }

@@ -52,7 +52,7 @@ public class Player1 {
     private int miniMax(Tauler taulerModificat, int profunditat){
 
         if(profunditat == this.maxProfunditat){
-            return taulerModificat.heuristic();
+            return heuristic(taulerModificat);
         }
 
         int millor;
@@ -66,7 +66,7 @@ public class Player1 {
         }
 
         if (millor < 0)
-            return taulerModificat.heuristic();
+            return heuristic(taulerModificat);
         return millor;
     }
 
@@ -138,7 +138,7 @@ public class Player1 {
     private int alfaBeta(Tauler taulerModificat, int profunditat, int alfa, int beta){
 
         if(profunditat == this.maxProfunditat){
-            return taulerModificat.heuristic();
+            return heuristic(taulerModificat);
         }
 
         if (profunditat % 2 == 0) {  //Max
@@ -155,7 +155,7 @@ public class Player1 {
         Queue<Move> movimentsPossibles = generarMovimentsPossibles(taulerModificat);
 
         if (movimentsPossibles.isEmpty())
-            return taulerModificat.heuristic();
+            return heuristic(taulerModificat);
 
         while(!movimentsPossibles.isEmpty() && alfa < beta){
 
@@ -193,7 +193,7 @@ public class Player1 {
         LinkedList<Move> movimentsPossibles = generarMovimentsPossibles(taulerModificat);
 
         if (movimentsPossibles.isEmpty())
-            return taulerModificat.heuristic();
+            return heuristic(taulerModificat);
 
         while(!movimentsPossibles.isEmpty() && alfa < beta){
 
@@ -254,5 +254,93 @@ public class Player1 {
 
     public char getAlgorisme() {
         return algorisme;
+    }
+
+
+    public int heuristic(Tauler tauler){
+        int valor = 0,
+                jugadorActual = tauler.getTornActual();
+
+        for(int x = 0; x < tauler.getX(); x++){
+            for(int y = 0; y < tauler.getY(); y++){
+                if (tauler.getpos(x, y) != 0) {
+                    valor += valorarPos(tauler, x, y);
+                }
+            }
+        }
+        return valor;
+    }
+
+    private int valorarPos(Tauler tauler, int col, int row){
+        if (tauler.getpos(col, row) == 0)
+            return 0;
+        return valorarJugador(tauler, col, row, tauler.getTornActual()) -
+               valorarJugador(tauler, col, row, tauler.getTornActual()%2+1);
+    }
+
+    private int valorarJugador(Tauler tauler, int col, int row, int jugador){
+        int x, y;
+        int valorTotal = 0,
+                valorComprovacio;
+
+        /* Vertical inferior*/
+        x = col; y = row; valorComprovacio = 0;
+        while (--y > 0 && tauler.getpos(x, y) == jugador)
+            valorComprovacio++;
+        valorTotal+=valorarComprovacio(valorComprovacio);
+
+        /* Vertical superior */
+        x = col; y = row; valorComprovacio = 0;
+        while (++y < tauler.getY()-1 && tauler.getpos(x, y) == tauler.getTornActual())
+            valorComprovacio++;
+        valorTotal+=valorarComprovacio(valorComprovacio);
+
+        /* Diagonal inferior esquerre */
+        x = col; y = row; valorComprovacio = 0;
+        while (--y > 0 && --x > 0 && tauler.getpos(x, y) == tauler.getTornActual())
+            valorComprovacio++;
+        valorTotal+=valorarComprovacio(valorComprovacio);
+
+        /* Diagonal superior esquerre */
+        x = col; y = row; valorComprovacio = 0;
+        while (++y < tauler.getY()-1 && --x > 0 && tauler.getpos(x, y) == tauler.getTornActual())
+            valorComprovacio++;
+        valorTotal+=valorarComprovacio(valorComprovacio);
+
+        /* Diagonal inferior dreta */
+        x = col; y = row; valorComprovacio = 0;
+        while (--y > 0 && ++x < tauler.getX()-1 && tauler.getpos(x, y) == tauler.getTornActual())
+            valorComprovacio++;
+        valorTotal+=valorarComprovacio(valorComprovacio);
+
+        /* Diagonal superior dreta */
+        x = col; y = row; valorComprovacio = 0;
+        while (++y < tauler.getY()-1 && ++x < tauler.getX()-1 && tauler.getpos(x, y) == tauler.getTornActual())
+            valorComprovacio++;
+        valorTotal+=valorarComprovacio(valorComprovacio);
+
+        /* Horitzontal esquerre */
+        x = col; y = row; valorComprovacio = 0;
+        while (--x > 0 && tauler.getpos(x, y) == tauler.getTornActual())
+            valorComprovacio++;
+        valorTotal+=valorarComprovacio(valorComprovacio);
+
+        /* Horitzontal dreta */
+        x = col; y = row;
+        while (++x < tauler.getX()-1 && tauler.getpos(x, y) == tauler.getTornActual())
+            valorComprovacio++;
+        valorTotal+=valorarComprovacio(valorComprovacio);
+        return valorTotal;
+    }
+
+    private int valorarComprovacio(int valorComprovacio){
+        switch (valorComprovacio){
+            case 3:
+                return valorComprovacio*10;
+            case 4:
+                return valorComprovacio*100;
+            default:
+                return valorComprovacio;
+        }
     }
 }
