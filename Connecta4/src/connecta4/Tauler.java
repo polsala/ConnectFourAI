@@ -55,6 +55,10 @@ public class Tauler {
         return this.taulell[x][y];
     }
     
+    public void forcepos(int x,int y){
+        this.taulell[x][y]=0;
+    }
+    
     public void setpos(int x,int y) {
         /* Afegeix una fitxa
          */
@@ -76,6 +80,7 @@ public class Tauler {
             
         }else{
             int[] tir=jugador2.tirada();
+            System.out.println("x:" + tir[0] + "y" + tir[1]);
             setpos(tir[0],tir[1]);
             acabat=fi();
             this.jugador=1;
