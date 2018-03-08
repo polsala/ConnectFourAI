@@ -16,67 +16,64 @@ public class Player1 {
 
     private Tauler meutaulell;
     private int maxProfunditat;
-
-    public class Move {
-        private int []pos;
-
-        Move(int x, int y){
-            this.pos = new int[]{x,y};
-        }
-        Move(){
-            this.pos = new int[]{0,0};
-        }
-
-        public int getX(){
-            return this.pos[0];
-        }
-
-        public int getY(){
-            return this.pos[1];
-        }
-    }
+    private char algorisme;
 
     Player1(Tauler entrada){
         meutaulell = entrada;
-        maxProfunditat = 8;
+        maxProfunditat = 10;
+        algorisme = 'a';
     }
 
     public int[] tirada(){
-        int [][]taulerAux = copiaTauler(meutaulell.getTaulell());
-        int millorValor = Integer.MIN_VALUE;
-        int [] millorMov = new int[]{0,1};
-        LinkedList<int[]> movimentsPossibles = generarMovimentsPossibles(taulerAux);
+
+        /*Per començar, generem els moviments possibles actuals i ens quedem amb el més prometedor
+         * Suposare això com a un nivell de recursitivat ja, per això, les crides a alfa-beta i minimax, les fem
+         * amb profunditat 1.*/
+
+        int [][]taulerOriginal = copiaTauler(meutaulell.getTaulell());
+
+        int valorMillorTirada = Integer.MIN_VALUE;
+
+        int [] millorMoviment = new int[]{0,0};
+
+        LinkedList<int[]> movimentsPossibles = generarMovimentsPossibles(taulerOriginal);
+
         while(!movimentsPossibles.isEmpty()){
-            int [] mov = movimentsPossibles.poll();
-            taulerAux[mov[0]][mov[1]] = 1;
-            int valor = miniMax(taulerAux, 1);
-            if (valor > millorValor){
-                millorMov = mov;
-                millorValor = valor;
+
+            int[] movimentActual = movimentsPossibles.poll();
+            int valorMovimentActual = Integer.MIN_VALUE;
+
+            taulerOriginal[movimentActual[0]][movimentActual[1]] = 1;
+            if (this.algorisme == 'm')
+                valorMovimentActual = miniMax(taulerOriginal, 1);
+            else if (this.algorisme == 'a')
+                valorMovimentActual = alfaBeta(taulerOriginal, 1, Integer.MIN_VALUE, Integer.MAX_VALUE);
+            if (valorMovimentActual > valorMillorTirada){
+                millorMoviment = movimentActual;
+                valorMillorTirada = valorMovimentActual;
             }
+
         }
-        return millorMov;
+        return millorMoviment;
     }
+
+    /* ======================= CODI MINIMAX =============================*/
 
     private int miniMax(int [][] taulerModificat, int profunditat){
 
         if(profunditat == this.maxProfunditat){
-            return heuristic(taulerModificat, profunditat%2+1);
+            return heuristic(taulerModificat, profunditat);
         }
 
-        int millor;
         if (profunditat % 2 == 0) {  //Max
 
-            millor = movimentMax(taulerModificat, ++profunditat);
+            return movimentMax(taulerModificat, ++profunditat);
 
         } else { //Min
 
-            millor = movimentMinim(taulerModificat, ++profunditat);
+            return movimentMinim(taulerModificat, ++profunditat);
         }
 
-        if (millor < 0)
-            return heuristic(taulerModificat, profunditat);
-        return millor;
     }
 
     private int movimentMinim(int[][] taulerModificat, int profunditat){
@@ -84,17 +81,18 @@ public class Player1 {
         int[] millorMoviment = new int[]{0,0};
         int millorHeuristic = Integer.MAX_VALUE;
 
+        int jugadorActual = profunditat % 2;
         LinkedList<int[]> movimentsPossibles = generarMovimentsPossibles(taulerModificat);
 
         if (movimentsPossibles.isEmpty())
-            return -1;
+            return heuristic(taulerModificat, profunditat);
 
         int[] movimentPossible;
         while(!movimentsPossibles.isEmpty()){
             movimentPossible = movimentsPossibles.poll();
             if (taulerModificat[movimentPossible[0]][movimentPossible[1]] == 0) {
                 int [][]taulerAux = copiaTauler(taulerModificat);
-                taulerAux[movimentPossible[0]][movimentPossible[1]] = profunditat%2+1;
+                taulerAux[movimentPossible[0]][movimentPossible[1]] = jugadorActual;
                 int valorHeuristic = miniMax(taulerAux, profunditat);
 
                 if (valorHeuristic < millorHeuristic) {
@@ -103,7 +101,7 @@ public class Player1 {
                 }
             }
         }
-        taulerModificat[millorMoviment[0]][millorMoviment[1]] = profunditat%2+1;
+        taulerModificat[millorMoviment[0]][millorMoviment[1]] = jugadorActual;
         return millorHeuristic;
     }
 
@@ -114,15 +112,16 @@ public class Player1 {
         LinkedList<int[]> movimentsPossibles = generarMovimentsPossibles(taulerModificat);
 
         if (movimentsPossibles.isEmpty())
-            return -1;
+            return heuristic(taulerModificat, profunditat);
 
         int[] movimentPossible;
+        int jugadorActual = profunditat % 2;
         while(!movimentsPossibles.isEmpty()){
             movimentPossible = movimentsPossibles.poll();
             if (taulerModificat[movimentPossible[0]][movimentPossible[1]] == 0) {
 
                 int [][]taulerAux = copiaTauler(taulerModificat);
-                taulerAux[movimentPossible[0]][movimentPossible[1]] = profunditat%2+1;
+                taulerAux[movimentPossible[0]][movimentPossible[1]] = jugadorActual;
                 int valorHeuristic = miniMax(taulerAux, profunditat);
 
                 if (valorHeuristic > millorHeuristic) {
@@ -131,110 +130,107 @@ public class Player1 {
                 }
             }
         }
-        taulerModificat[millorMoviment[0]][millorMoviment[1]] = profunditat%2+1;
+        taulerModificat[millorMoviment[0]][millorMoviment[1]] = jugadorActual;
         return millorHeuristic;
     }
 
+    /* ====================================================================*/
 
-//    private int alfaBeta(Tauler taulerModificat, int profunditat, int alfa, int beta){
-//
-//        if(profunditat == this.maxProfunditat){
-//            return heuristic(taulerModificat);
-//        }
-//
-//        if (profunditat % 2 == 0) {  //Max
-//            return movimentMaxAlfaBeta(taulerModificat, ++profunditat, alfa, beta);
-//        } else { //Min
-//            return movimentMinimAlfaBeta(taulerModificat, ++profunditat, alfa, beta);
-//        }
-//    }
+    /* ======================= CODI ALFA-BETA =============================*/
 
-//    private int movimentMaxAlfaBeta(Tauler taulerModificat, int profunditat, int alfa, int beta){
-//
-//        Move millorMoviment = null, movimentPossible;
-//
-//        Queue<Move> movimentsPossibles = generarMovimentsPossibles(taulerModificat);
-//
-//        if (movimentsPossibles.isEmpty())
-//            return heuristic(taulerModificat);
-//
-//        while(!movimentsPossibles.isEmpty() && alfa < beta){
-//
-//            movimentPossible = movimentsPossibles.poll();
-//            if (taulerModificat.getpos(movimentPossible.getX(), movimentPossible.getY()) == 0) {
-//
-//                int [][]taulerAux = copiaTauler(taulerModificat);
-//                taulerAux[movimentPossible.getX()][movimentPossible.getY()] = profunditat%2+1;
-//
-//                int valorHeuristic = alfaBeta(taulerAux, profunditat, alfa, beta);
-//
-//                if (valorHeuristic > alfa) {
-//                    alfa = valorHeuristic;
-//                    millorMoviment = movimentPossible;
-//                }
-//            }
-//
-//        }
-//        if (millorMoviment != null)
-//            taulerModificat.setpos(
-//                millorMoviment.getX(),
-//                millorMoviment.getY()
-//            );
-//        return alfa;
-//    }
-//
-//    private int movimentMinimAlfaBeta(Tauler taulerModificat, int profunditat, int alfa, int beta){
-//
-//        Move millorMoviment = null, movimentPossible;
-//
-//        LinkedList<Move> movimentsPossibles = generarMovimentsPossibles(taulerModificat);
-//
-//        if (movimentsPossibles.isEmpty())
-//            return heuristic(taulerModificat);
-//
-//        while(!movimentsPossibles.isEmpty() && alfa < beta){
-//
-//            movimentPossible = movimentsPossibles.poll();
-//            if (taulerModificat.getpos(movimentPossible.getX(), movimentPossible.getY()) == 0) {
-//
-//                Tauler taulerAux = new Tauler(taulerModificat);
-//                taulerAux.setTorn(profunditat % 2 + 1);
-//                taulerAux.setpos(
-//                    movimentPossible.getX(),
-//                    movimentPossible.getY()
-//                );
-//
-//                int valorHeuristic = alfaBeta(taulerAux, profunditat, alfa, beta);
-//
-//                if (valorHeuristic < beta) {
-//                    beta = valorHeuristic;
-//                    millorMoviment = movimentPossible;
-//                }
-//
-//            }
-//
-//        }
-//        if (millorMoviment != null)
-//            taulerModificat.setpos(
-//                millorMoviment.getX(),
-//                millorMoviment.getY()
-//            );
-//        return beta;
-//    }
+    private int alfaBeta(int[][] taulerModificat, int profunditat, int alfa, int beta){
+
+        if(profunditat == this.maxProfunditat){
+            return heuristic(taulerModificat, profunditat);
+        }
+
+        if (profunditat % 2 == 0) {  //Max
+            return movimentMaxAlfaBeta(taulerModificat, ++profunditat, alfa, beta);
+        } else { //Min
+            return movimentMinimAlfaBeta(taulerModificat, ++profunditat, alfa, beta);
+        }
+    }
+
+    private int movimentMaxAlfaBeta(int[][] taulerModificat, int profunditat, int alfa, int beta){
+
+        int[] millorMoviment = new int[]{0,0};
+        int[] movimentPossible;
+
+        LinkedList<int[]> movimentsPossibles = generarMovimentsPossibles(taulerModificat);
+
+        int jugadorActual = profunditat % 2;
+        if (movimentsPossibles.isEmpty())
+            return heuristic(taulerModificat, profunditat);
+
+        while(!movimentsPossibles.isEmpty() && alfa < beta){
+
+            movimentPossible = movimentsPossibles.poll();
+            if (taulerModificat[movimentPossible[0]][movimentPossible[1]] == 0) {
+
+                int [][]taulerAux = copiaTauler(taulerModificat);
+                taulerAux[movimentPossible[0]][movimentPossible[1]] = jugadorActual;
+
+                int valorHeuristic = alfaBeta(taulerAux, profunditat, alfa, beta);
+
+                if (valorHeuristic > alfa) {
+                    alfa = valorHeuristic;
+                    millorMoviment = movimentPossible;
+                }
+            }
+
+        }
+        taulerModificat[millorMoviment[0]][millorMoviment[1]] = jugadorActual;
+        return alfa;
+    }
+
+    private int movimentMinimAlfaBeta(int[][] taulerModificat, int profunditat, int alfa, int beta){
+
+        int[] millorMoviment = new int[]{0,0};
+        int[] movimentPossible;
+
+        LinkedList<int[]> movimentsPossibles = generarMovimentsPossibles(taulerModificat);
+
+        int jugadorActual = profunditat % 2;
+        if (movimentsPossibles.isEmpty())
+            return heuristic(taulerModificat, profunditat);
+
+        while(!movimentsPossibles.isEmpty() && alfa < beta){
+
+            movimentPossible = movimentsPossibles.poll();
+            if (taulerModificat[movimentPossible[0]][movimentPossible[1]] == 0) {
+
+                int [][]taulerAux = copiaTauler(taulerModificat);
+                taulerAux[movimentPossible[0]][movimentPossible[1]] = jugadorActual;
+
+                int valorHeuristic = alfaBeta(taulerAux, profunditat, alfa, beta);
+
+                if (valorHeuristic < beta) {
+                    beta = valorHeuristic;
+                    millorMoviment = movimentPossible;
+                }
+
+            }
+
+        }
+        taulerModificat[millorMoviment[0]][millorMoviment[1]] = jugadorActual;
+        return beta;
+    }
+
+    /* ====================================================================*/
+
+    /* ========================= CODI COMÚ ===============================*/
 
     public LinkedList<int[]> generarMovimentsPossibles(int[][] tauler){
-        int tableWidth = tauler.length;
 
-        LinkedList<int[]> moviments = new LinkedList<int[]>();
-        ArrayList<Integer> columnesAleatories = new ArrayList<Integer>();
-
-        for (int i = 0; i < tableWidth; i++)
+        ArrayList<Integer> columnesAleatories = new ArrayList<>();
+        for (int i = 0; i < tauler.length; i++)
             columnesAleatories.add(i);
-
         Collections.shuffle(columnesAleatories);
-        for (int col: columnesAleatories){
-            moviments.add(new int[]{col, primeraFilaBuida(tauler, col)});
-        }
+
+        LinkedList<int[]> moviments = new LinkedList<>();
+        columnesAleatories.forEach((columna)->{
+            moviments.add(new int[]{columna, primeraFilaBuida(tauler, columna)});
+        });
         return moviments;
     }
 
@@ -245,14 +241,13 @@ public class Player1 {
         return row;
     }
 
-
     public int heuristic(int[][] tauler, int nivell){
         int valor = 0;
-
+        int jugadorActual = nivell % 2;
         for(int x = 0; x < tauler.length; x++){
             for(int y = 0; y < tauler[x].length; y++){
                 if (tauler[x][y] != 0) {
-                    valor += valorarPos(tauler, x, y, nivell);
+                    valor += valorarPos(tauler, x, y, jugadorActual);
                 }
             }
         }
@@ -262,77 +257,68 @@ public class Player1 {
     private int valorarPos(int [][] tauler, int col, int row, int tornActual){
         if (tauler[col][row] == 0)
             return 0;
-        return valorarJugador(tauler, col, row, tornActual) - valorarJugador(tauler, col, row, tornActual%2+1);
+        return valorarJugador(tauler, col, row, tornActual);
     }
 
     private int valorarJugador(int[][] tauler, int col, int row, int jugador){
         int x, y;
-        int valorTotal = 0,
-                valorComprovacio;
+        int valorTotal = 0, valorComprovacio;
+
+        // Ometem tots els recorreguts a l'esquerre ja que ja les haurem comprovat prèviament per el disseny del
+        // recorregut del mètode heuristic().
 
         /* Vertical inferior*/
         x = col; y = row; valorComprovacio = 0;
-        while (y > 0 && tauler[x][y--] == jugador)
+        while (dinsElTauler(tauler, x, y) && tauler[x][y--] == jugador)
             valorComprovacio++;
-        if (tauler[x][y--] == 0)
-            while (y > 0 && tauler[x][y--] == jugador)
+        if (dinsElTauler(tauler, x, y) && tauler[x][y--] == 0)
+            while (dinsElTauler(tauler, x, y) && tauler[x][y--] == jugador)
                 valorComprovacio++;
         valorTotal+=valorarComprovacio(valorComprovacio);
 
         /* Vertical superior */
         x = col; y = row; valorComprovacio = 0;
-        while (y < tauler[x].length-1 && tauler[x][y++] == jugador)
+        while (dinsElTauler(tauler, x, y) && tauler[x][y++] == jugador)
             valorComprovacio++;
-        if (tauler[x][y++] == 0)
-            while (y < tauler[x].length-1 && tauler[x][y++] == jugador)
+        if (dinsElTauler(tauler, x, y) && tauler[x][y++] == 0)
+            while (dinsElTauler(tauler, x, y) && tauler[x][y++] == jugador)
                 valorComprovacio++;
         valorTotal+=valorarComprovacio(valorComprovacio);
 
-//        /* Diagonal inferior esquerre */
-//        x = col; y = row; valorComprovacio = 0;
-//        while (--y > 0 && --x > 0 && tauler[x][y] == jugador)
-//            valorComprovacio++;
-//        valorTotal+=valorarComprovacio(valorComprovacio);
-
-//        /* Diagonal superior esquerre */
-//        x = col; y = row; valorComprovacio = 0;
-//        while (++y < tauler[x].length-1 && --x > 0 && tauler[x][y] == jugador)
-//            valorComprovacio++;
-//        valorTotal+=valorarComprovacio(valorComprovacio);
-
         /* Diagonal inferior dreta */
         x = col; y = row; valorComprovacio = 0;
-        while (y > 0 && x < tauler.length-1 && tauler[++x][y--] == jugador)
+        while (dinsElTauler(tauler, x, y) && tauler[x++][y--] == jugador)
             valorComprovacio++;
-        if (tauler[x++][y] == 0)
-            while (y > 0 && x < tauler.length-1 && tauler[x++][y--] == jugador)
+        if (dinsElTauler(tauler, x, y) && tauler[x++][y] == 0)
+            while (dinsElTauler(tauler, x, y) && tauler[x++][y--] == jugador)
                 valorComprovacio++;
         valorTotal+=valorarComprovacio(valorComprovacio);
 
         /* Diagonal superior dreta */
         x = col; y = row; valorComprovacio = 0;
-        while (y < tauler[x].length-1 && x < tauler.length-1 && tauler[x++][y++] == jugador)
+        while (dinsElTauler(tauler, x, y) && tauler[x++][y++] == jugador)
             valorComprovacio++;
-        if (tauler[x++][y++] == 0)
-            while (x < tauler.length-1 && y < tauler[x].length-1 && tauler[x++][y++] == jugador)
+        if (dinsElTauler(tauler, x, y) && tauler[x++][y++] == 0)
+            while (dinsElTauler(tauler, x, y) && tauler[x++][y++] == jugador)
                 valorComprovacio++;
         valorTotal+=valorarComprovacio(valorComprovacio);
-
-//        /* Horitzontal esquerre */
-//        x = col; y = row; valorComprovacio = 0;
-//        while (--x > 0 && tauler[x][y] == jugador)
-//            valorComprovacio++;
-//        valorTotal+=valorarComprovacio(valorComprovacio);
 
         /* Horitzontal dreta */
         x = col; y = row;
-        while (x < tauler.length-1 && tauler[x++][y] == jugador)
+        while (dinsElTauler(tauler, x, y) && tauler[x++][y] == jugador)
             valorComprovacio++;
-        if (tauler[x++][y] == 0)
-            while (x < tauler.length-1 && tauler[x++][y] == jugador)
+        if (dinsElTauler(tauler, x, y) && tauler[x++][y] == 0)
+            while (dinsElTauler(tauler, x, y) && tauler[x++][y] == jugador)
                 valorComprovacio++;
         valorTotal+=valorarComprovacio(valorComprovacio);
         return valorTotal;
+    }
+
+    private boolean dinsElTauler(int[][] tauler, int x, int y){
+        return x < tauler.length &&
+                x >= 0 &&
+                y < tauler[x].length &&
+                y >= 0;
     }
 
     private int valorarComprovacio(int valorComprovacio){
@@ -355,4 +341,8 @@ public class Player1 {
         }
         return copia;
     }
+
+    /* ====================================================================*/
 }
+
+
