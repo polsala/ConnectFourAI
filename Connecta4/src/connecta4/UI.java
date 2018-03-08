@@ -46,7 +46,7 @@ public class UI extends javax.swing.JFrame {
     public UI() {
         initComponents();
 
-        escena = new Tauler(preguntarProfunditat(), preguntarAlgorisme());
+        escena = new Tauler();
         initable();
         pinta();
         //Posem icona eXiT a la finestra
@@ -173,7 +173,7 @@ public class UI extends javax.swing.JFrame {
         
         //parem el timer si esta actiu!
         timer.stop();
-        escena = new Tauler(preguntarProfunditat(), preguntarAlgorisme());
+        escena = new Tauler();
          //L'escenari esta creat, inicialitsem la taula
          initable();
          pinta();
