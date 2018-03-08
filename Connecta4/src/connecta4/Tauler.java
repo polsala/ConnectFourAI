@@ -80,6 +80,7 @@ public class Tauler {
             
         }else{
             int[] tir=jugador2.tirada();
+            System.out.println("x:" + tir[0] + "y" + tir[1]);
             setpos(tir[0],tir[1]);
             acabat=fi();
             this.jugador=1;

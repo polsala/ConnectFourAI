@@ -246,9 +246,7 @@ public class UI extends javax.swing.JFrame {
         }
         for (int i = 0; i != escena.getX(); i++) {
             for (int j = 0; j != escena.getY(); j++) {
-                System.out.println(patt);
                 String dir = System.getProperty("user.dir") + patt + Integer.toString(escena.getpos(i, j)) + ".jpg";
-                System.out.println(dir);
                 ImageIcon icon= new ImageIcon(dir);
                 jTable2.setValueAt(icon, (int) escena.getY() - j -1, (int) i);//la visualitzacio s'ha de girar
             }
