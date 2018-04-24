@@ -12,10 +12,7 @@ import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.ImageIcon;
-import javax.swing.JFileChooser;
-import javax.swing.JTable;
-import javax.swing.Timer;
+import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 /*Interficie grafica, aqui es definiran les accions dels botons de la interficie
  * d'usuari
@@ -48,6 +45,7 @@ public class UI extends javax.swing.JFrame {
     //inicialització i posem l'icona d'exit
     public UI() {
         initComponents();
+
         escena = new Tauler();
         initable();
         pinta();
@@ -163,13 +161,9 @@ public class UI extends javax.swing.JFrame {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         /* Callback del Boto Start. Inicia el timer i si no hi ha més simulació 
          * mostrara la taula de resultats*/
-       
-           
             escena.Step();
             initable();
             pinta();
-        
-
     }//GEN-LAST:event_jButton1ActionPerformed
 
     //reload
@@ -235,6 +229,7 @@ public class UI extends javax.swing.JFrame {
     private javax.swing.JButton jButton4;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTable jTable2;
+    private javax.swing.JTextField jTextField;
     // End of variables declaration//GEN-END:variables
 
     
@@ -281,7 +276,7 @@ public class UI extends javax.swing.JFrame {
         }
 
         //posem el color
-       // jTable2.setBackground(Color.white);
+        jTable2.setBackground(Color.white);
 
         //posem les mides a les celles
         jTable2.setRowHeight(height);

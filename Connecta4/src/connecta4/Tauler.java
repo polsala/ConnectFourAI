@@ -4,8 +4,8 @@ import java.awt.Frame;
 import javax.swing.JOptionPane;
 /*
  * Es la classe que mantindra en memoria tot el nostre entorn de simulació.
- * Aqui és on trobarem les llistes de robots, bruticies, parets i la paperera 
- * que intervenen a la simulació actual. També hi tenim definida la creació de 
+ * Aqui és on trobarem les llistes de robots, bruticies, parets i la paperera
+ * que intervenen a la simulació actual. També hi tenim definida la creació de
  * l'entorn i funcions de execució pas per pas.
  */
 
@@ -17,7 +17,7 @@ public class Tauler {
 
     //Atributs publics per facilitar acces
 
-    
+
     //atributs privats
     private int dimx;
     private int dimy;
@@ -42,7 +42,7 @@ public class Tauler {
         }
         jugador1 = new Player1(this);
         jugador2 = new Player2(this);
-        
+
     }
 
     public int[][] getTaulell(){
@@ -54,16 +54,16 @@ public class Tauler {
          */
         return this.taulell[x][y];
     }
-    
+
     public void setpos(int x,int y) {
         /* Afegeix una fitxa
          */
-            if(this.taulell[x][y]==0){//si es buida
-                this.taulell[x][y]=this.jugador;
-            }else{
-                Frame frame = new Frame();
-                JOptionPane.showMessageDialog(frame, "Jugador"+ this.jugador +" fa un moviment no valid!");
-            }
+        if(this.taulell[x][y]==0){//si es buida
+            this.taulell[x][y]=this.jugador;
+        }else{
+            Frame frame = new Frame();
+            JOptionPane.showMessageDialog(frame, "Jugador"+ this.jugador +" fa un moviment no valid!");
+        }
     }
 
     public boolean Step() {
@@ -73,7 +73,7 @@ public class Tauler {
             setpos(tir[0],tir[1]);
             acabat=fi();
             this.jugador=2;
-            
+
         }else{
             int[] tir=jugador2.tirada();
             setpos(tir[0],tir[1]);
@@ -102,7 +102,7 @@ public class Tauler {
 
     private boolean fi() {
         //si ha acabat el joc retornar true altrament false
-        
+
         //horitzontal
         for(int i=0;i<this.getX()-3;i++){
             for(int j=0;j<this.getY();j++){
@@ -117,11 +117,11 @@ public class Tauler {
                         Frame frame = new Frame();
                         JOptionPane.showMessageDialog(frame, "Guanya jugador2! (horitzontal)");
                         return true;
-                    }                
-                }               
+                    }
+                }
             }
         }
-        
+
         //vertical
         for(int i=0;i<this.getX();i++){
             for(int j=0;j<this.getY()-3;j++){
@@ -136,11 +136,11 @@ public class Tauler {
                         Frame frame = new Frame();
                         JOptionPane.showMessageDialog(frame, "Guanya jugador2! (vertical)");
                         return true;
-                    }                
-                }               
+                    }
+                }
             }
         }
-        
+
         //diagonal 1
         for(int i=0;i<this.getX()-3;i++){
             for(int j=0;j<this.getY()-3;j++){
@@ -151,15 +151,15 @@ public class Tauler {
                         return true;
                     }
                 }else if (this.getpos(i,j) == 2){
-                    if(this.getpos(i+1,j) == 2&&this.getpos(i+2,j+2) == 2&&this.getpos(i+3,j+3) == 2){
+                    if(this.getpos(i+1,j+1) == 2&&this.getpos(i+2,j+2) == 2&&this.getpos(i+3,j+3) == 2){
                         Frame frame = new Frame();
                         JOptionPane.showMessageDialog(frame, "Guanya jugador2! (diagonal 1)");
                         return true;
-                    }                
-                }               
+                    }
+                }
             }
         }
-        
+
         //diagonal 2
         for(int i=0;i<this.getX()-3;i++){
             for(int j=3;j<this.getY();j++){
@@ -174,13 +174,13 @@ public class Tauler {
                         Frame frame = new Frame();
                         JOptionPane.showMessageDialog(frame, "Guanya jugador2! (diagonal 2)");
                         return true;
-                    }                
-                }               
+                    }
+                }
             }
         }
-        
+
         //fi de joc no queden caselles lliures
-         for(int i=0;i<this.getX();i++){
+        for(int i=0;i<this.getX();i++){
             for(int j=0;j<this.getY();j++){
                 if (this.getpos(i,j) == 0){
                     return false;
@@ -188,7 +188,7 @@ public class Tauler {
             }
         }
         Frame frame2 = new Frame();
-         JOptionPane.showMessageDialog(frame2, "Empat!");
+        JOptionPane.showMessageDialog(frame2, "Empat!");
         return true;
     }
 }
